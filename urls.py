@@ -1,7 +1,10 @@
-from django.contrib import admin
-from django.urls import path, include
+from . import views
+from django.urls import path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('manoj.urls')),  # Include your app's URLs
+    path('', views.login, name='login'),
+    path('navbar/', views.navbar, name='navbar'),
+     path('home/', views.home, name='home'),
+     path('profile/', views.profile, name='profile'),
+
 ]
