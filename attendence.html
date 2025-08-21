@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Program</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            color: #333;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Background Gradient */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6e7dff, #ff91a4);
+            z-index: -2;
+        }
+
+        /* Floating Bubbles Effect */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.6);
+            animation: bubbleAnimation 8s infinite;
+        }
+
+        @keyframes bubbleAnimation {
+            0% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Generate bubbles at random positions */
+        .bubble:nth-child(1) { left: 5%; width: 40px; height: 40px; animation-duration: 7s; animation-delay: 0s; }
+        .bubble:nth-child(2) { left: 15%; width: 50px; height: 50px; animation-duration: 6s; animation-delay: 2s; }
+        .bubble:nth-child(3) { left: 30%; width: 60px; height: 60px; animation-duration: 8s; animation-delay: 4s; }
+        .bubble:nth-child(4) { left: 50%; width: 70px; height: 70px; animation-duration: 5s; animation-delay: 1s; }
+        .bubble:nth-child(5) { left: 70%; width: 80px; height: 80px; animation-duration: 6s; animation-delay: 3s; }
+        .bubble:nth-child(6) { left: 85%; width: 45px; height: 45px; animation-duration: 7s; animation-delay: 6s; }
+
+        /* Main Container Styles */
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: #4e5b94;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ff91a4;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        td {
+            background-color: #f9f9f9;
+            font-size: 1rem;
+        }
+
+        .profile-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 18px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-button i {
+            margin-right: 5px;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding-top: 60px;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: #ff91a4;
+        }
+
+        .modal-content ul {
+            list-style-type: none;
+            padding: 0;
+            font-size: 18px;
+        }
+
+        .modal-content ul li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f2f2f2;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .settings-btn {
+            background-color: #007bff;
+        }
+
+        .settings-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Other UI Components */
+        .add-student-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .add-student-container input,
+        .add-student-container button {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .student-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .student-actions button {
+            background-color: #dc3545;
+        }
+
+        .student-actions button:hover {
+            background-color: #c82333;
+        }
+
+        .upload-photo-container input {
+            margin: 5px 0;
+        }
+
+        .notification {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Student Attendance System</h1>
+
+        <table id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Student Name</th>
+                    <th>Profile Photo</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Student Rows will be inserted here dynamically -->
+            </tbody>
+        </table>
+
+        <br>
+        <button class="settings-btn" onclick="openSettingsModal()">Add Student</button>
+        <button onclick="generateReport()">Generate Report</button>
+        <button onclick="downloadReport()">Download Report</button>
+
+        <div id="reportModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Attendance Report</h2>
+                <ul id="reportList"></ul>
+            </div>
+        </div>
+
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeSettingsModal()">&times;</span>
+                <h2>Settings</h2>
+                <div class="add-student-container">
+                    <label for="newStudentName">Student Name:</label>
+                    <input type="text" id="newStudentName" placeholder="Enter student's name">
+
+                    <label for="newStudentRoll">Roll Number:</label>
+                    <input type="text" id="newStudentRoll" placeholder="Enter student's roll number">
+
+                    <div class="upload-photo-container">
+                        <label for="newStudentPhoto">Upload Profile Photo:</label>
+                        <input type="file" id="newStudentPhoto">
+                    </div>
+
+                    <button onclick="addStudent()">Add Student</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="notification" class="notification"></div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
+    <script>
+        // Function to mark attendance for a student
+        function markAttendance(button) {
+            const currentText = button.textContent.trim();
+
+            // Toggle between Present and Absent
+            if (currentText === "Present") {
+                button.innerHTML = '<i class="fa fa-times"></i> Absent';
+                button.style.backgroundColor = '#dc3545';
+            } else {
+                button.innerHTML = '<i class="fa fa-check"></i> Present';
+                button.style.backgroundColor = '#28a745';
+            }
+        }
+
+        // Function to delete a student from the table
+        function deleteStudent(button) {
+            const row = button.closest('tr');
+            row.remove();
+            showNotification("Student deleted successfully!");
+        }
+
+        // Function to open the settings modal
+        function openSettingsModal() {
+            document.getElementById("settingsModal").style.display = "block";
+        }
+
+        // Function to close the settings modal
+        function closeSettingsModal() {
+            document.getElementById("settingsModal").style.display = "none";
+        }
+
+        // Function to open the report modal
+        function generateReport() {
+            const students = document.querySelectorAll("#attendanceTable tbody tr");
+            const reportList = document.getElementById("reportList");
+            reportList.innerHTML = '';
+
+            students.forEach(student => {
+                const roll = student.cells[0].textContent;
+                const name = student.cells[1].textContent;
+                const status = student.cells[3].querySelector("button").textContent.trim();
+                const listItem = document.createElement('li');
+                listItem.textContent = `${name} (Roll: ${roll}) - ${status}`;
+                reportList.appendChild(listItem);
+            });
+
+            document.getElementById("reportModal").style.display = "block";
+        }
+
+        // Function to close the report modal
+        function closeModal() {
+            document.getElementById("reportModal").style.display = "none";
+        }
+
+        // Function to download the report as a CSV file
+        function downloadReport() {
+            const students = document.querySelectorAll("#attendanceTable tbody tr");
+            let csvContent = "Roll No, Student Name, Status\n";
+
+            students.forEach(student => {
+                const roll = student.cells[0].textContent;
+                const name = student.cells[1].textContent;
+                const status = student.cells[3].querySelector("button").textContent.trim();
+                csvContent += `${roll}, ${name}, ${status}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'attendance_report.csv';
+            link.click();
+        }
+
+        // Function to add a new student
+        function addStudent() {
+            const studentName = document.getElementById("newStudentName").value.trim();
+            const rollNumber = document.getElementById("newStudentRoll").value.trim();
+            const photoInput = document.getElementById("newStudentPhoto");
+            const file = photoInput.files[0] || null;
+
+            if (!studentName || !rollNumber) {
+                showNotification("Please enter both name and roll number.");
+                return;
+            }
+
+            // Check for duplicate roll number
+            const existingRows = document.querySelectorAll("#attendanceTable tbody tr");
+            for (let row of existingRows) {
+                if (row.cells[0].textContent === rollNumber) {
+                    showNotification("Duplicate roll number found!");
+                    return;
+                }
+            }
+
+            const photoURL = file ? URL.createObjectURL(file) : "https://via.placeholder.com/40";
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${rollNumber}</td>
+                <td>${studentName}</td>
+                <td><img class="profile-photo" src="${photoURL}" alt="${studentName}'s photo"></td>
+                <td><button class="status-button" onclick="markAttendance(this)"><i class="fa fa-check"></i> Present</button></td>
+                <td class="student-actions">
+                    <button onclick="deleteStudent(this)">Delete</button>
+                </td>
+            `;
+            document.querySelector("#attendanceTable tbody").appendChild(newRow);
+            closeSettingsModal();
+            showNotification("Student added successfully!");
+        }
+
+        // Function to display notification
+        function showNotification(message) {
+            const notification = document.getElementById("notification");
+            notification.textContent = message;
+            notification.style.display = "block";
+
+            setTimeout(() => {
+                notification.style.display = "none";
+            }, 3000);
+        }
+    </script>
+
+</body>
+</html>
